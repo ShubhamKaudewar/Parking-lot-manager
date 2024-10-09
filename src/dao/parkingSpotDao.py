@@ -23,12 +23,11 @@ class ParkingSpotDao:
             })
         return results
 
-    def get_all_parking_spot_details_by_id(self, parking_id):
+    def get_parking_spot_details_by_id(self, parking_id):
         qry_object = self.session.query(ParkingSpot).filter(ParkingSpot.parkingId == parking_id)
-        results = []
         if qry_object.first():
             obj = qry_object.first()
-            results.append({
+            response = {
                 "status": "success",
                 "data": {
                     "parkingId": obj.parkingId,
@@ -36,13 +35,13 @@ class ParkingSpotDao:
                     "status": obj.status,
                     "vehicleType": obj.vehicleType
                 }
-            })
+            }
         else:
-            results.append({
+            response = {
                 "status": "failure",
                 "message": f"No details found for id:{parking_id}"
-            })
-        return results
+            }
+        return response
 
     def get_vehicle_details_from_number_plate(self, number_plate):
         details = self.session.query(Vehicle).filter(Vehicle.licensePlate == number_plate).all()

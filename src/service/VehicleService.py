@@ -26,8 +26,8 @@ async def get_all_vehicles_details():
     return {"status": "success", "data": response}
 
 @app.get("/vehicle/{id}")
-def get_all_vehicles_details_by_id(id: int):
-    response = VehicleDao().get_all_vehicles_details_by_id(id)
+def get_vehicle_details_by_id(id: int):
+    response = VehicleDao().get_vehicle_details_by_id(id)
     return response
 
 @app.post("/vehicle/")

@@ -23,8 +23,8 @@ async def get_all_parking_spots():
     return {"status": "success", "data": response}
 
 @app.get("/parking-spot/{id}")
-def get_all_parking_spot_by_id(id: int):
-    response = ParkingSpotDao().get_all_parking_spot_details_by_id(id)
+def get_parking_spot_by_id(id: int):
+    response = ParkingSpotDao().get_parking_spot_details_by_id(id)
     return response
 
 @app.post("/parking-spot/")
