@@ -10,23 +10,23 @@ class Reservation(BaseModel):
     vehicleId: int
 
 class ReservationUpdate(BaseModel):
+    vehicleId: int | None = None
+    parkingId: int | None = None
     startTime: int | None = None
     endTime: int | None = None
-    parkingId: str | None = None
-    vehicleId: str | None = None
 
 app = FastAPI()
 from src.dao.reservationDao import ReservationDao
 
 
 @app.get("/reservation/")
-async def get_all_vehicles_details():
-    response = VehicleDao().get_all_vehicle_details()
-    return {"status": "success", "data": response}
+async def get_all_reservation_details():
+    response = ReservationDao().get_all_reservation_details()
+    return response
 
 @app.get("/reservation/{id}")
-def get_all_vehicles_details_by_id(id: int):
-    response = VehicleDao().get_all_vehicles_details_by_id(id)
+def get_reservation_details_by_id(id: int):
+    response = ReservationDao().get_reservation_details_by_id(id)
     return response
 
 @app.post("/reservation/")
@@ -45,14 +45,20 @@ async def create_reservation_details(data: Reservation):
     return response
 
 @app.put("/reservation/{id}")
-async def update_parking_spot_details_by_id(id: int, data: ReservationUpdate):
+async def update_reservation_details_by_id(id: int, data: ReservationUpdate):
     request = {
-        "licensePlate": data.licensePlate,
-        "ownerName": data.ownerName,
-        "vehicleType": data.vehicleType,
+        "parkingId": data.parkingId,
+        "vehicleId": data.vehicleId
     }
-    print("parking spot details update for ID:", id, "data:", request)
-    response = VehicleDao().update_vehicle_details_by_id(id, request)
+    from src.util.date_util import get_millis_from_date_string
+    if data.startTime:
+        start_time = get_millis_from_date_string(data.startTime)
+        request["startTime"] = start_time
+    if data.endTime:
+        end_time = get_millis_from_date_string(data.endTime)
+        request["endTime"] = end_time
+    print("Reservation details update for ID:", id, "data:", request)
+    response = ReservationDao().update_registration_details_by_id(id, request)
     print("response", response)
     return response
 

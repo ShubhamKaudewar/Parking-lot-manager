@@ -12,6 +12,11 @@ def get_date_in_string_from_millis(date_in_millis):
     return datetime.fromtimestamp(date_in_seconds).strftime('%Y-%m-%d, %H:%M:%S')
 
 
+def get_millis_from_date_string(date_string):
+    dt = datetime.strptime(date_string, '%Y-%m-%d, %H:%M:%S')
+    return int(dt.timestamp() * 1000)
+
+
 def todayEOD():
     d = datetime.now()
     totalSeconds = (datetime(d.year, d.month, d.day, 10, 0, 0) - datetime(1970, 1, 1)).total_seconds()

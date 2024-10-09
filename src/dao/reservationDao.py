@@ -13,35 +13,57 @@ class ReservationDao:
         super().__init__()
         self.session = Session()
 
-    def get_all_vehicle_details(self):
-        qry_object = self.session.query(Vehicle).all()
-        results = []
-        for obj in qry_object:
-            results.append({
-                "vehicleId": obj.vehicleId,
-                "licensePlate": obj.licensePlate,
-                "vehicleType": obj.vehicleType,
-                "ownerName": obj.ownerName
-            })
-        return results
+    def get_all_reservation_details(self):
+        qry_object = self.session.query(Reservation).all()
 
-    def get_all_vehicles_details_by_id(self, vehicle_id):
-        qry_object = self.session.query(Vehicle).filter(Vehicle.vehicleId == vehicle_id)
+        if qry_object:
+            from src.util.date_util import get_date_in_string_from_millis
+            data = []
+
+            for obj in qry_object:
+                start_time = get_date_in_string_from_millis(int(obj.startTime))
+                end_time = get_date_in_string_from_millis(int(obj.endTime))
+                data.append({
+                    "reservationId": obj.reservationId,
+                    "parkingId": obj.parkingId,
+                    "vehicleId": obj.vehicleId,
+                    "startTime": start_time,
+                    "endTime": end_time
+                })
+            response = {
+                "status": "success",
+                "data": data
+            }
+        else:
+            response = {
+                "status": "success",
+                "message": "No reservation as of now",
+                "data": []
+            }
+        return response
+
+    def get_reservation_details_by_id(self, reservation_id):
+        qry_object = self.session.query(Reservation).filter(Reservation.reservationId == reservation_id)
         if qry_object.first():
             obj = qry_object.first()
+
+            from src.util.date_util import get_date_in_string_from_millis
+            start_time = get_date_in_string_from_millis(int(obj.startTime))
+            end_time = get_date_in_string_from_millis(int(obj.endTime))
             response = {
                 "status": "success",
                 "data": {
+                    "reservationId": obj.reservationId,
+                    "parkingId": obj.parkingId,
                     "vehicleId": obj.vehicleId,
-                    "licensePlate": obj.licensePlate,
-                    "vehicleType": obj.vehicleType,
-                    "ownerName": obj.ownerName
+                    "startTime": start_time,
+                    "endTime": end_time
                 }
             }
         else:
             response = {
                 "status": "failure",
-                "message": f"No details found for id:{vehicle_id}"
+                "message": f"No details found for id:{reservation_id}"
             }
         return response
 
@@ -131,21 +153,23 @@ class ReservationDao:
             }
         return response
 
-    def update_vehicle_details_by_id(self, vehicle_id, data):
-        qry_object = self.session.query(Vehicle)\
-            .filter(Vehicle.vehicleId == vehicle_id)
+    def update_registration_details_by_id(self, reservation_id, data):
+        qry_object = self.session.query(Reservation)\
+            .filter(Reservation.reservationId == reservation_id).first()
 
-        if qry_object.first():
-            obj = qry_object.first()
-            if data.get("licensePlate"):
-                obj.licensePlate = data.get("licensePlate")
-            if data.get("ownerName"):
-                obj.ownerName = data.get("ownerName")
-            if data.get("vehicleType"):
-                obj.vehicleType = data.get("vehicleType")
+        if qry_object:
+            obj = qry_object
+            if data.get("startTime"):
+                obj.startTime = data.get("startTime")
+            if data.get("endTime"):
+                obj.endTime = data.get("endTime")
+            if data.get("vehicleId"):
+                obj.vehicleId = data.get("vehicleId")
+            if data.get("parkingId"):
+                obj.parkingId = data.get("parkingId")
             response = {
                 "status": "success",
-                "message": f"Vehicle details of id:{vehicle_id} updated successfully!"
+                "message": f"Reservation details of id:{reservation_id} updated successfully!"
             }
 
             import sqlalchemy as sa
@@ -160,7 +184,7 @@ class ReservationDao:
         else:
             response = {
                 "status": "failure",
-                "message": f"No details found for id:{vehicle_id}"
+                "message": f"No details found for id:{reservation_id}"
             }
         return response
 

@@ -22,10 +22,21 @@ async def get_all_parking_spots():
     response = ParkingSpotDao().get_all_parking_spot_details()
     return {"status": "success", "data": response}
 
+@app.get("/parking-spot/available")
+async def get_all_available_parking_spots():
+    response = ParkingSpotDao().get_all_available_parking_spots()
+    return response
+
 @app.get("/parking-spot/{id}")
 def get_parking_spot_by_id(id: int):
     response = ParkingSpotDao().get_parking_spot_details_by_id(id)
     return response
+
+@app.get("/parking-spot/{id}/status")
+def get_parking_spot_by_id(id: int):
+    response = ParkingSpotDao().get_parking_spot_status_by_id(id)
+    return response
+
 
 @app.post("/parking-spot/")
 async def create_parking_spot(data: ParkingSpot):

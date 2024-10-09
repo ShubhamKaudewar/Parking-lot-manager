@@ -23,6 +23,14 @@ class ParkingSpotDao:
             })
         return results
 
+    def get_all_available_parking_spots(self):
+        qry_object = self.session.query(ParkingSpot).all()
+        spots_available = [i for i in range(1, 20)]
+        for obj in qry_object:
+            spots_available.remove(obj.spotNumber)
+        response = {"status": "success", "data": spots_available}
+        return response
+
     def get_parking_spot_details_by_id(self, parking_id):
         qry_object = self.session.query(ParkingSpot).filter(ParkingSpot.parkingId == parking_id)
         if qry_object.first():
@@ -35,6 +43,21 @@ class ParkingSpotDao:
                     "status": obj.status,
                     "vehicleType": obj.vehicleType
                 }
+            }
+        else:
+            response = {
+                "status": "failure",
+                "message": f"No details found for id:{parking_id}"
+            }
+        return response
+
+    def get_parking_spot_status_by_id(self, parking_id):
+        qry_object = self.session.query(ParkingSpot).filter(ParkingSpot.parkingId == parking_id)
+        if qry_object.first():
+            obj = qry_object.first()
+            response = {
+                "status": "success",
+                "parkingSpotStatus": obj.status
             }
         else:
             response = {
