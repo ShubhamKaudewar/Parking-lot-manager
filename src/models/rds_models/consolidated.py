@@ -12,8 +12,8 @@ Base = mapper_registry.generate_base()
 class ParkingSpot(Base):
     __tablename__ = "parkingSpot"
 
-    parkingId = Column(Integer, primary_key=True)
-    spotNumber = Column(Integer)
+    parkingId = Column(Integer, primary_key=True, autoincrement=True)
+    spotNumber = Column(Integer, nullable=False)
     status = Column(String(255))
     vehicleType = Column(String(255))
 
@@ -24,7 +24,7 @@ class ParkingSpot(Base):
 class Vehicle(Base):
     __tablename__ = "vehicle"
 
-    vehicleId = Column(Integer, primary_key=True)
+    vehicleId = Column(Integer, primary_key=True, autoincrement=True)
     licensePlate = Column(String(255))
     vehicleType = Column(String(255))
     ownerName = Column(String(255))
@@ -36,7 +36,7 @@ class Vehicle(Base):
 class Reservation(Base):
     __tablename__ = "reservation"
 
-    reservationId = Column(Integer, primary_key=True)
+    reservationId = Column(Integer, primary_key=True, autoincrement=True)
     parkingId = Column(Integer, ForeignKey("parkingSpot.parkingId"))
     vehicleId = Column(Integer, ForeignKey("vehicle.vehicleId"))
     startTime = Column(Numeric(20, 0))
