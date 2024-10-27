@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from typing import Union
+from fastapi import FastAPI, APIRouter, Request
 from pydantic import BaseModel
+from .limiterService import limiter
 
 # Define ParkingSpot model
 class ParkingSpot(BaseModel):
@@ -16,30 +16,36 @@ class ParkingSpotUpdate(BaseModel):
 app = FastAPI()
 from src.dao.parkingSpotDao import ParkingSpotDao
 
+router = APIRouter(prefix="/parking-spot")
 
-@app.get("/parking-spot/")
-async def get_all_parking_spots():
+@router.get("")
+@limiter.limit("1/second")
+async def get_all_parking_spots(request: Request) -> dict:
     response = ParkingSpotDao().get_all_parking_spot_details()
     return {"status": "success", "data": response}
 
-@app.get("/parking-spot/available")
-async def get_all_available_parking_spots():
+@router.get("/available")
+@limiter.limit("1/second")
+async def get_all_available_parking_spots(request: Request) -> dict:
     response = ParkingSpotDao().get_all_available_parking_spots()
     return response
 
-@app.get("/parking-spot/{id}")
-def get_parking_spot_by_id(id: int):
+@router.get("/{id}")
+@limiter.limit("1/second")
+def get_parking_spot_by_id(request: Request, id: int) -> dict:
     response = ParkingSpotDao().get_parking_spot_details_by_id(id)
     return response
 
-@app.get("/parking-spot/{id}/status")
-def get_parking_spot_by_id(id: int):
+@router.get("/{id}/status")
+@limiter.limit("10/second")
+def get_parking_spot_by_id(request: Request, id: int) -> dict:
     response = ParkingSpotDao().get_parking_spot_status_by_id(id)
     return response
 
 
-@app.post("/parking-spot/")
-async def create_parking_spot(data: ParkingSpot):
+@router.post("/")
+@limiter.limit("1/second")
+async def create_parking_spot(request: Request, data: ParkingSpot) -> dict:
     request = {
         "spotNumber": data.spotNumber,
         "status": data.status,
@@ -50,8 +56,9 @@ async def create_parking_spot(data: ParkingSpot):
     return {"status": "success", "data": request}
 
 
-@app.put("/parking-spot/{id}")
-async def update_parking_spot_details_by_id(id: int, data: ParkingSpotUpdate):
+@router.put("/{id}")
+@limiter.limit("1/second")
+async def update_parking_spot_details_by_id(request: Request, id: int, data: ParkingSpotUpdate) -> dict:
     request = {
         "spotNumber": data.spotNumber,
         "status": data.status,
@@ -62,7 +69,8 @@ async def update_parking_spot_details_by_id(id: int, data: ParkingSpotUpdate):
     print("response", response)
     return response
 
-@app.delete("/parking-spot/{id}")
-async def delete_parking_spot(id: int):
+@router.delete("/{id}")
+@limiter.limit("1/second")
+async def delete_parking_spot(request: Request, id: int) -> dict:
     response = ParkingSpotDao().delete_parking_spot_details_by_id(id)
     return response

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from typing import Union
 from pydantic import BaseModel
 
@@ -17,20 +17,21 @@ class VehicleUpdate(BaseModel):
     ownerName: str | None = None
 
 app = FastAPI()
+router = APIRouter(prefix="/vehicle")
 from src.dao.parkingSpotDao import ParkingSpotDao
 
 
-@app.get("/vehicle/")
+@router.get("")
 async def get_all_vehicles_details():
     response = VehicleDao().get_all_vehicle_details()
     return {"status": "success", "data": response}
 
-@app.get("/vehicle/{id}")
+@router.get("/{id}")
 def get_vehicle_details_by_id(id: int):
     response = VehicleDao().get_vehicle_details_by_id(id)
     return response
 
-@app.post("/vehicle/")
+@router.post("/")
 async def create_vehicle_details(data: Vehicle):
     request = {
         "licensePlate": data.licensePlate,
@@ -41,7 +42,7 @@ async def create_vehicle_details(data: Vehicle):
     response = VehicleDao().create_vehicle_details(request)
     return response
 
-@app.put("/vehicle/{id}")
+@router.put("/{id}")
 async def update_parking_spot_details_by_id(id: int, data: VehicleUpdate):
     request = {
         "licensePlate": data.licensePlate,
@@ -53,7 +54,7 @@ async def update_parking_spot_details_by_id(id: int, data: VehicleUpdate):
     print("response", response)
     return response
 
-@app.delete("/vehicle/{id}")
+@router.delete("/{id}")
 async def delete_vehicle_details(id: int):
     response = VehicleDao().delete_vehicle_details_by_id(id)
     return response

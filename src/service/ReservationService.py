@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from pydantic import BaseModel
 
 from src.dao.vehicleDao import VehicleDao
@@ -16,20 +16,22 @@ class ReservationUpdate(BaseModel):
     endTime: int | None = None
 
 app = FastAPI()
+
+router = APIRouter(prefix="/reservation")
 from src.dao.reservationDao import ReservationDao
 
 
-@app.get("/reservation/")
+@router.get("")
 async def get_all_reservation_details():
     response = ReservationDao().get_all_reservation_details()
     return response
 
-@app.get("/reservation/{id}")
+@router.get("/{id}")
 def get_reservation_details_by_id(id: int):
     response = ReservationDao().get_reservation_details_by_id(id)
     return response
 
-@app.post("/reservation/")
+@router.post("/")
 async def create_reservation_details(data: Reservation):
     from src.util.date_util import current_time_in_millis
     start_time = current_time_in_millis()
@@ -44,7 +46,7 @@ async def create_reservation_details(data: Reservation):
     response = ReservationDao().create_reservation_details(request)
     return response
 
-@app.put("/reservation/{id}")
+@router.put("/{id}")
 async def update_reservation_details_by_id(id: int, data: ReservationUpdate):
     request = {
         "parkingId": data.parkingId,
@@ -62,7 +64,7 @@ async def update_reservation_details_by_id(id: int, data: ReservationUpdate):
     print("response", response)
     return response
 
-@app.delete("/reservation/{id}")
+@router.delete("/{id}")
 async def delete_reservation_details(id: int):
     response = ReservationDao().delete_reservation_details_by_id(id)
     return response
