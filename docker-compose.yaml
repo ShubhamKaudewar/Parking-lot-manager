@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    command: sh -c "uvicorn src.service.ParkingSpotService:app --reload --port=8000 --host=0.0.0.0"
+    env_file:
+      - .env.docker
+    ports:
+      - "8000:8000"
+      - "1434:1433"
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Login@2024
+    ports:
+      - "1433:1433"

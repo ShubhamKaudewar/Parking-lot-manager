@@ -1,14 +1,15 @@
 from sqlalchemy.orm import sessionmaker
 from os import environ
-
+from dotenv import load_dotenv
+from os import environ
 
 class DBEngine:
     def __init__(self):
-        self.host_name = environ['hostIP']
-        self.port = environ['port']
-        self.username = environ['username']
-        self.password = environ['password']
-        self.database = environ["database"]
+        self.host_name = environ.get('hostIP')
+        self.port = environ.get('port')
+        self.username = environ.get('username')
+        self.password = environ.get('password')
+        self.database = environ.get("database")
         self.dialect = 'mssql+pyodbc'
 
     def start_engine(self):
